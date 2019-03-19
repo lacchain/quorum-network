@@ -30,7 +30,7 @@ It is necessary to enable the following network ports in the machine in which we
 
 * **21000**: TCP/UDP - Port to establish communication between geth processes.
 
-* **22000**: TCP - Port to establish RPC communication. (this port is used for applications that communicate with Alastria and may be leaked to the Internet)
+* **22000**: TCP - Port to establish RPC communication. (this port is used for applications that communicate with Lacchain and may be leaked to the Internet)
 
 ## Prerequisites
 
@@ -53,7 +53,7 @@ $ sudo apt-get install ansible
 To configure and install Quorum and Constellation, you must clone this git repository in your **local machine**.
 
 ```
-$ git clone https://github.com/everisblockchain/lacchain.git
+$ git clone https://github.com/lacchain/Lacchain
 $ cd lacchain/
 ```
 
@@ -92,13 +92,13 @@ $ sudo apt-get install python-pip
 * To deploy a **validator node** execute the following command in your **local machine**, without forgetting to set the private key in the option --private-key and the ssh connection user in the -u option:
 
 	```
-	$ ansible-playbook -i inventory -e first_node=false --private-key=~/.ssh/id_rsa -u vagrant site-everis-lacchain-validator.yml
+	$ ansible-playbook -i inventory -e first_node=false --private-key=~/.ssh/id_rsa -u vagrant site-lacchain-validator.yml
 	```
 
 * To deploy a **regular node** execute the following command in your **local machine**, without forgetting to set the private key in the option --private-key and the ssh connection user in the -u option:
 
 	```
-	$ ansible-playbook -i inventory --private-key=~/.ssh/id_rsa -u vagrant site-everis-lacchain-regular.yml
+	$ ansible-playbook -i inventory --private-key=~/.ssh/id_rsa -u vagrant site-lacchain-regular.yml
 	```
 * When starting the installation, it will request that some data be entered, such as the public IP, geth account password and node name. The name of the node will be the one that will finally appear in the network monitoring tool.
 
@@ -113,7 +113,7 @@ $ sudo apt-get install python-pip
 * If you did not clone the LACCHAIN repository in previous steps, then you need to clone it now.
 
 ```
-$ git clone https://github.com/everisblockchain/lacchain.git
+$ git clone https://github.com/lacchain/Lacchain
 $ cd lacchain/ 
 ```
 
@@ -204,7 +204,7 @@ Once we have modified these files, you can start up the node with this command i
 On the other hand, if the node is a validator, the rest of the nodes in the network must execute to update permissioned-nodes.json file:
 
 ```
-$ ansible-playbook -i inventory -e validator=yes -e regular=no --private-key=~/.ssh/id_rsa -u adrian site-everis-lacchain-update.yml
+$ ansible-playbook -i inventory -e validator=yes -e regular=no --private-key=~/.ssh/id_rsa -u adrian site-lacchain-update.yml
 ```
 
 after the validator nodes add to the new validator node in their *permissioned-nodes.json* file of nodes allowed, execute in **remote machine** the next command:
@@ -241,7 +241,7 @@ Thus, the new node will be raised and synchronized with the network **if and onl
 > **NEVER MAKE A PROPOSAL WITHOUT FIRST UPDATING THE FILES MENTIONED IN: "Configuring the Quorum node file"**,after updating the files, you **need** to run the command:
 
 ```
-ansible-playbook -i inventory -e validator=yes -e regular=no --private-key=~/.ssh/id_rsa -u adrian site-everis-lacchain-update.yml
+ansible-playbook -i inventory -e validator=yes -e regular=no --private-key=~/.ssh/id_rsa -u adrian site-lacchain-update.yml
 ```
 
 > **A VALIDATOR NODE MUST NEVER BE ELIMINATED WITHOUT PROPOSING THE REMOVAL THROUGH A PULL REQUEST SO THAT THE REST OF THE VALIDATING MEMBERS WILL REMOVE THEM FROM THEIR FILES (PERMISSIONED-NODES.JSON, STATIC-NODES.JSON) FIRST AND THEN PROCEEED TO A VOTING ROUND:**
@@ -265,7 +265,7 @@ $ geth --exec 'istanbul.propose("0x59d9F63451811C2c3C287BE40a2206d201DC3BfF",tru
  * The next statement allows you to back up the node's state. It also makes a backup copy of the keys and the enode of your node. All backup copies are stored in the home directory as `~/lacchain-keysBackup`.
  
 ```
-$ ansible-playbook -i inventory -e validator=true --private-key=~/.ssh/id_rsa -u vagrant site-everis-lacchain-backup.yml 
+$ ansible-playbook -i inventory -e validator=true --private-key=~/.ssh/id_rsa -u vagrant site-lacchain-backup.yml 
 ```
 
 **NOTE**
@@ -273,7 +273,7 @@ If we want to generate the node using an enode and the keys of an existing node 
 of the old node:
 
 ```
-$ ansible-playbook -i inventory -e validator=true --private-key=~/.ssh/id_rsa -u vagrant site-everis-lacchain-backup.yml 
+$ ansible-playbook -i inventory -e validator=true --private-key=~/.ssh/id_rsa -u vagrant site-lacchain-backup.yml 
 
 ```
 
