@@ -1,0 +1,170 @@
+---
+- name: init quorum
+  debug:
+      msg: "Init Quorum"
+
+- name: get public ip
+  shell: dig +short myip.opendns.com @resolver1.opendns.com 2>/dev/null || curl -s --retry 2 icanhazip.com
+  register: node_ip
+
+- name: create lacchain directories
+  file:
+      path: "{{ item.dest }}"
+      mode: "{{ item.mode }}"
+      state: directory
+  with_items:
+      - { dest: "~/lacchain/data/keystore", mode: "0440" }
+      - { dest: "~/lacchain/data/geth", mode: "0440" }
+      - { dest: "~/lacchain/logs", mode: "0440" }
+      - { dest: "~/lacchain/tmp", mode: "0440" }
+
+- name: Copy permissioned nodes file
+  copy:
+      src: "{{ role_path }}/files/permissioned-nodes_validator.json"
+      dest: ~/lacchain/tmp/permissioned-nodes_validator.json
+      mode: 0755
+#  when: not first_node
+
+- name: Copy general nodes file
+  copy:
+      src: "{{ playbook_dir }}/roles/lacchain-regular-node/files/permissioned-nodes_general.json"
+      dest: ~/lacchain/tmp/permissioned-nodes_general.json
+      mode: 0755
+#  when: not first_node
+
+- name: copy password to file
+  copy:
+      dest: "~/lacchain/tmp/.account_pass"
+      content: |
+          {{password}}
+
+- name: initializing geth from genesis.json
+  debug:
+      msg: initializing Geth
+
+- name: Copy genesis quorum file
+  copy:
+      src: "{{ role_path }}/files/genesis.json"
+      dest: ~/lacchain/data/genesis.json
+      mode: 0755
+
+- name: initializing Geth
+  shell: geth --datadir ~/lacchain/data init ~/lacchain/data/genesis.json
+
+- name: Copy node key to first validator node
+  copy:
+      src: "{{ role_path }}/files/nodekey"
+      dest: ~/lacchain/data/geth/nodekey
+      mode: 0700
+  when: first_node
+
+- name: get bootnode
+  shell: bootnode -genkey ~/lacchain/data/geth/nodekey
+#  when: not first_node
+
+- name: save enode in variable
+  shell: bootnode -nodekey ~/lacchain/data/geth/nodekey -writeaddress
+  register: enode_key
+#  when: not first_node
+
+- name: print enode key
+  debug:
+      msg: enode://{{enode_key.stdout}}@{{node_ip.stdout}}:21000?discport=0
+#  when: not first_node
+
+- name: update permissioned nodes validator file
+  replace:
+      dest: ~/lacchain/tmp/permissioned-nodes_validator.json
+      regexp: 'discport=0"$'
+      replace: 'discport=0",'
+#  when: not first_node
+
+- name: add new permissioned node validator
+  lineinfile:
+      path: ~/lacchain/tmp/permissioned-nodes_validator.json
+      regexp: "$]$"
+      insertbefore: "^]$"
+      line: '    "enode://{{enode_key.stdout}}@{{node_ip.stdout}}:21000?discport=0"'
+#  when: not first_node
+
+- name: Fetch permissioned node validator
+  fetch:
+      src: ~/lacchain/tmp/permissioned-nodes_validator.json
+      dest: "{{ role_path }}/files/"
+      flat: yes
+#  when: not first_node
+
+- name: update permissioned nodes general file
+  replace:
+      dest: ~/lacchain/tmp/permissioned-nodes_general.json
+      regexp: 'discport=0"$'
+      replace: 'discport=0",'
+#  when: not first_node
+
+- name: add new permissioned node validator
+  lineinfile:
+      path: ~/lacchain/tmp/permissioned-nodes_general.json
+      regexp: "$]$"
+      insertbefore: "^]$"
+      line: '    "enode://{{enode_key.stdout}}@{{node_ip.stdout}}:21000?discport=0"'
+#  when: not first_node
+
+- name: Fetch permissioned node general file
+  fetch:
+      src: ~/lacchain/tmp/permissioned-nodes_general.json
+      dest: "{{ playbook_dir }}/roles/lacchain-regular-node/files/"
+      flat: yes
+#  when: not first_node
+
+- name: copy permissioned nodes to node validator
+  copy:
+      src: "{{ role_path }}/files/permissioned-nodes_validator.json"
+      dest: ~/lacchain/data/permissioned-nodes.json
+      mode: 0755
+#  when: not first_node
+
+- name: copy static nodes to node validator
+  copy:
+      src: "{{ role_path }}/files/permissioned-nodes_validator.json"
+      dest: ~/lacchain/data/static-nodes.json
+      mode: 0755
+#  when: not first_node
+
+- name: copy static nodes to first node validator
+  copy:
+      src: "{{role_path}}/files/static-nodes.json"
+      dest: ~/lacchain/data/static-nodes.json
+      mode: 0755
+  when: first_node
+
+- name: copy permissioned nodes to first node validator
+  copy:
+      src: "{{role_path}}/files/static-nodes.json"
+      dest: ~/lacchain/data/permissioned-nodes.json
+      mode: 0755
+  when: first_node
+
+- name: copy address to first validator node
+  copy:
+      src: "{{ role_path }}/files/UTC--2017-09-20T08-43-59.003454005Z--58b8527743f89389b754c63489262fdfc9ba9db6"
+      dest: ~/lacchain/data/keystore/UTC--2017-09-20T08-43-59.003454005Z--58b8527743f89389b754c63489262fdfc9ba9db6
+      mode: 0700
+  when: first_node
+
+- name: Generate shell script to execute geth service
+  template:
+      src: "startquorum.j2"
+      dest: "~/lacchain/start-quorum.sh"
+      mode: 0775
+      force: yes
+
+- name: Copy service file to systemd
+  copy:
+      src: "{{ role_path }}/files/geth.service"
+      dest: /lib/systemd/system/geth.service
+      mode: 0775
+
+- name: Enable service geth
+  service:
+      name: geth
+      enabled: yes

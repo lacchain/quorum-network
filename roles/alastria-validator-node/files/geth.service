@@ -1,0 +1,10 @@
+[Unit]
+Description=Ethereum go client
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/root/lacchain/start-quorum.sh
+
+[Install]
+WantedBy=default.target
