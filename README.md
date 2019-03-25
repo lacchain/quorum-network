@@ -1,5 +1,9 @@
 # ALASTRIA LATIN AMERICA AND THE CARIBBEAN #
 
+## NOTES
+
+This work was done by EVERIS and is completely donated to ALASTRIA LATIN AMERICA AND THE CARIBBEAN Consortium.
+
 ## References
 
 * This Quorum network uses [IBFT](https://github.com/ethereum/EIPs/issues/650) consensus with validator and regular nodes located around Latin America and the Caribbean. 
@@ -280,3 +284,13 @@ $ ansible-playbook -i inventory -e validator=true --private-key=~/.ssh/id_rsa -u
 This will generate the folder ~/lacchain-keysBackup whose contents should be moved to ~/lacchain/data/keys.
 The keys of this directory (which has to keep the folder structure of the generated backup) will be the ones used
 in the image of the node that we are going to generate.
+
+
+&nbsp;
+&nbsp;
+
+**LICENSE**
+
+<center><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></center>
+
+This work is licensed under a [license](http://creativecommons.org/licenses/by-nc/4.0/)
