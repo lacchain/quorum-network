@@ -1,8 +1,8 @@
-# ALASTRIA LATIN AMERICA AND THE CARIBBEAN #
+# LACCHAIN #
 
 ## NOTES
 
-This work was done by EVERIS and is completely donated to ALASTRIA LATIN AMERICA AND THE CARIBBEAN Consortium.
+This work was done by EVERIS and is completely donated to LACCHAIN Consortium.
 
 ## References
 
