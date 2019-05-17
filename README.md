@@ -2,7 +2,7 @@
 
 ## NOTES
 
-This work was done by EVERIS and is completely donated to LACCHAIN Consortium.
+This work was done by EVERIS and is completely donated to LACChain Consortium.
 
 ## References
 
