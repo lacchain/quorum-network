@@ -1,5 +1,7 @@
 # LACCHAIN #
 
+--- This network is not active now. If you want to deploy your application in an ethereum-based LACChain network, check our [Besu network](https://github.com/lacchain/besu-network) ---
+
 ## NOTES
 
 This work was done by EVERIS and is completely donated to LACChain Consortium.
